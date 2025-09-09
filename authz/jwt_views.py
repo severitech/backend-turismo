@@ -46,12 +46,17 @@ def verify_password(plain, stored_hash):
 def login_view(request):
     email = request.data.get("email")
     password = request.data.get("password")
+    
+    if not email or not password:
+        return Response({"detail": "Email y contraseña son requeridos"}, status=400)
+    
     try:
         u = Usuario.objects.get(email=email, estado="ACTIVO")
     except Usuario.DoesNotExist:
-        return Response({"detail":"Credenciales inválidas"}, status=401)
+        return Response({"detail": "Credenciales inválidas"}, status=401)
+    
     if not verify_password(password, u.password_hash):
-        return Response({"detail":"Credenciales inválidas"}, status=401)
+        return Response({"detail": "Credenciales inválidas"}, status=401)
     # Si existe el Django User con ese email, emite tokens para ese usuario
     User = get_user_model()
     django_user = User.objects.filter(email=email).first()

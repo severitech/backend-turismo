@@ -110,7 +110,14 @@ class UsuarioViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=["post"], url_path="inhabilitar", permission_classes=[permissions.IsAuthenticated])
     def inhabilitar(self, request):
         """Permite al usuario autenticado inhabilitar (borrado lógico) su cuenta."""
-        usuario = Usuario.objects.get(email=request.user.email)
+        try:
+            usuario = Usuario.objects.get(email=request.user.email)
+        except Usuario.DoesNotExist:
+            return Response({"detail": "Usuario no encontrado."}, status=404)
+        
+        if usuario.estado != "ACTIVO":
+            return Response({"detail": "La cuenta ya está inactiva."}, status=400)
+            
         usuario.estado = "INACTIVO"
         usuario.save()
         return Response({"detail": "Cuenta inhabilitada. Si deseas reactivarla, contacta a un administrador."}, status=200)
@@ -118,19 +125,29 @@ class UsuarioViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=["post"], url_path="reactivar", permission_classes=[permissions.IsAuthenticated])
     def reactivar(self, request, pk=None):
         """Permite a un usuario con rol ADMIN reactivar una cuenta de usuario inactiva."""
-        usuario_admin = Usuario.objects.get(email=request.user.email)
+        try:
+            usuario_admin = Usuario.objects.get(email=request.user.email)
+        except Usuario.DoesNotExist:
+            return Response({"detail": "Usuario administrador no encontrado."}, status=404)
+            
         if not usuario_admin.roles.filter(nombre="ADMIN").exists():
             return Response({"detail": "No tienes permisos para realizar esta acción."}, status=403)
+            
         usuario = self.get_object()
         if usuario.estado != "INACTIVO":
             return Response({"detail": "La cuenta ya está activa."}, status=400)
+            
         usuario.estado = "ACTIVO"
         usuario.save()
         return Response({"detail": "Cuenta reactivada correctamente."}, status=200)
     @action(detail=False, methods=["get", "put", "patch"], url_path="me")
     def me(self, request):
         """Permite al usuario autenticado ver y actualizar sus propios datos."""
-        usuario = Usuario.objects.get(email=request.user.email)
+        try:
+            usuario = Usuario.objects.get(email=request.user.email)
+        except Usuario.DoesNotExist:
+            return Response({"detail": "Usuario no encontrado."}, status=404)
+            
         if request.method == "GET":
             return Response(UsuarioSerializer(usuario).data)
         elif request.method in ["PUT", "PATCH"]:

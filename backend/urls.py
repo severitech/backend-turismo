@@ -5,7 +5,7 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from authz.views import RolViewSet, UsuarioViewSet
 from catalogo.views import CategoriaViewSet, ServicioViewSet
 from reservas.views import ReservaViewSet, VisitanteViewSet, ReservaVisitanteViewSet
-# from cupones.views import CuponViewSet  # Commented out until CuponViewSet is implemented
+from cupones.views import CuponViewSet
 
 router = DefaultRouter()
 router.register(r"roles", RolViewSet)
@@ -15,7 +15,7 @@ router.register(r"servicios", ServicioViewSet)
 router.register(r"reservas", ReservaViewSet)
 router.register(r"visitantes", VisitanteViewSet)
 router.register(r"reserva-visitantes", ReservaVisitanteViewSet)
-# router.register(r"cupones", CuponViewSet)  # Commented out until CuponViewSet is implemented
+router.register(r"cupones", CuponViewSet)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
