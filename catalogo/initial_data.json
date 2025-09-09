@@ -1,0 +1,21 @@
+{
+  "categorias": [
+    {
+      "nombre": "Tours",
+      "descripcion": "Actividades turísticas"
+    }
+  ],
+  "servicios": [
+    {
+      "tipo": "TOUR",
+      "titulo": "Tour por la ciudad",
+      "descripcion": "Recorrido guiado por los principales puntos turísticos.",
+      "duracion_min": 120,
+      "costo": 100.00,
+      "capacidad_max": 20,
+      "punto_encuentro": "Plaza principal",
+      "visible_publico": true,
+      "categoria": 1
+    }
+  ]
+}
