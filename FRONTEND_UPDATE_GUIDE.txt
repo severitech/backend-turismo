@@ -1,0 +1,229 @@
+===============================================================================
+🚀 GUÍA PARA ACTUALIZAR FRONTEND - REGISTRO DE USUARIO
+===============================================================================
+
+📋 CONTEXTO
+-----------
+He actualizado mi backend Django para mejorar el formulario de registro de usuarios. 
+Necesito actualizar mi frontend para que coincida con los nuevos campos de la API.
+
+🔄 CAMBIOS REALIZADOS EN EL BACKEND
+-----------------------------------
+
+ANTES:
+{
+    "nombre": "Juan Pérez",
+    "email": "juan@email.com",
+    "password": "password123",
+    "password_confirm": "password123",
+    "telefono": "+591 70123456"
+}
+
+AHORA:
+{
+    "nombres": "Juan Carlos",
+    "apellidos": "Pérez García", 
+    "email": "juan.perez@email.com",
+    "password": "MiPassword123!",
+    "password_confirm": "MiPassword123!",
+    "telefono": "+591 70123456",
+    "fecha_nacimiento": "1990-05-15",
+    "genero": "M",
+    "documento_identidad": "12345678",
+    "pais": "Bolivia"
+}
+
+📊 ESPECIFICACIONES DE CAMPOS
+------------------------------
+
+CAMPOS REQUERIDOS:
+- nombres (String) - Nombres del usuario
+- apellidos (String) - Apellidos del usuario  
+- email (String) - Email único
+- password (String) - Contraseña (mínimo 8 caracteres)
+- password_confirm (String) - Confirmación de contraseña
+
+CAMPOS OPCIONALES:
+- telefono (String) - Número de teléfono
+- fecha_nacimiento (Date) - Formato: YYYY-MM-DD
+- genero (Select) - Opciones:
+  * "M" (Masculino)
+  * "F" (Femenino)
+  * "O" (Otro)
+  * "N" (Prefiero no decir)
+- documento_identidad (String) - Cédula de identidad o pasaporte
+- pais (String) - País de residencia
+
+🔧 ENDPOINT DE LA API
+---------------------
+URL: http://127.0.0.1:8000/api/auth/register/
+Método: POST
+Headers: Content-Type: application/json
+
+🎯 TAREAS A REALIZAR
+--------------------
+
+1. ACTUALIZAR FORMULARIO DE REGISTRO
+   - Cambiar campo "nombre" por "nombres" y "apellidos" (dos campos separados)
+   - Agregar campo "fecha_nacimiento" (date picker)
+   - Agregar campo "genero" (select/dropdown)
+   - Agregar campo "documento_identidad" (input text)
+   - Agregar campo "pais" (input text o select)
+
+2. VALIDACIONES FRONTEND
+   - nombres y apellidos: requeridos, solo letras y espacios
+   - email: formato válido de email
+   - password: mínimo 8 caracteres
+   - password_confirm: debe coincidir con password
+   - fecha_nacimiento: formato válido de fecha, usuario mayor de edad
+   - telefono: formato de teléfono válido (opcional)
+
+3. UX/UI MEJORADAS
+   Organizar campos en secciones lógicas:
+   
+   INFORMACIÓN PERSONAL:
+   - nombres
+   - apellidos
+   - fecha_nacimiento
+   - genero
+   
+   DATOS DE CONTACTO:
+   - email
+   - telefono
+   - pais
+   
+   IDENTIFICACIÓN:
+   - documento_identidad
+   
+   SEGURIDAD:
+   - password
+   - password_confirm
+
+   - Agregar placeholders descriptivos
+   - Mostrar indicadores de campos requeridos (*)
+   - Feedback visual para validaciones
+
+4. MANEJO DE RESPUESTAS
+
+RESPUESTA EXITOSA (201):
+{
+    "message": "Usuario registrado exitosamente",
+    "user": {
+        "id": 1,
+        "nombres": "Juan Carlos",
+        "apellidos": "Pérez García",
+        "nombre_completo": "Juan Carlos Pérez García",
+        "email": "juan.perez@email.com",
+        "telefono": "+591 70123456",
+        "fecha_nacimiento": "1990-05-15",
+        "genero": "M",
+        "documento_identidad": "12345678",
+        "pais": "Bolivia",
+        "estado": "ACTIVO",
+        "created_at": "2025-09-08T23:36:00Z"
+    }
+}
+
+ERRORES COMUNES (400):
+{
+    "email": ["email ya existe"],
+    "non_field_errors": ["Las contraseñas no coinciden."],
+    "nombres": ["Este campo es requerido."],
+    "apellidos": ["Este campo es requerido."]
+}
+
+💡 SUGERENCIAS DE IMPLEMENTACIÓN
+--------------------------------
+1. Mantener diseño responsive
+2. Agregar tooltips para explicar campos como "documento_identidad"
+3. Implementar autocompletado para "pais"
+4. Validación en tiempo real para mejor UX
+5. Mostrar fortaleza de contraseña
+6. Considerar usar librerías de validación (Yup, Joi, etc.)
+
+🎨 MEJORAS DE UX OPCIONALES
+---------------------------
+- Progreso visual del formulario (steps/wizard)
+- Animaciones suaves entre campos
+- Iconos descriptivos para cada campo
+- Dark mode compatibility
+- Internacionalización (i18n) para labels
+
+📝 EJEMPLO DE FORMULARIO HTML
+-----------------------------
+<form id="registerForm">
+  <!-- Información Personal -->
+  <fieldset>
+    <legend>Información Personal</legend>
+    <input type="text" name="nombres" placeholder="Nombres" required>
+    <input type="text" name="apellidos" placeholder="Apellidos" required>
+    <input type="date" name="fecha_nacimiento" placeholder="Fecha de Nacimiento">
+    <select name="genero">
+      <option value="">Seleccionar género</option>
+      <option value="M">Masculino</option>
+      <option value="F">Femenino</option>
+      <option value="O">Otro</option>
+      <option value="N">Prefiero no decir</option>
+    </select>
+  </fieldset>
+
+  <!-- Datos de Contacto -->
+  <fieldset>
+    <legend>Datos de Contacto</legend>
+    <input type="email" name="email" placeholder="Email" required>
+    <input type="tel" name="telefono" placeholder="Teléfono">
+    <input type="text" name="pais" placeholder="País">
+  </fieldset>
+
+  <!-- Identificación -->
+  <fieldset>
+    <legend>Identificación</legend>
+    <input type="text" name="documento_identidad" placeholder="Cédula de Identidad">
+  </fieldset>
+
+  <!-- Seguridad -->
+  <fieldset>
+    <legend>Seguridad</legend>
+    <input type="password" name="password" placeholder="Contraseña" required>
+    <input type="password" name="password_confirm" placeholder="Confirmar Contraseña" required>
+  </fieldset>
+
+  <button type="submit">Registrarse</button>
+</form>
+
+📋 EJEMPLO DE VALIDACIONES JAVASCRIPT
+--------------------------------------
+function validateForm(data) {
+  const errors = {};
+  
+  // Campos requeridos
+  if (!data.nombres) errors.nombres = 'Los nombres son requeridos';
+  if (!data.apellidos) errors.apellidos = 'Los apellidos son requeridos';
+  if (!data.email) errors.email = 'El email es requerido';
+  if (!data.password) errors.password = 'La contraseña es requerida';
+  if (!data.password_confirm) errors.password_confirm = 'Confirme la contraseña';
+  
+  // Validaciones específicas
+  if (data.email && !/\S+@\S+\.\S+/.test(data.email)) {
+    errors.email = 'Formato de email inválido';
+  }
+  
+  if (data.password && data.password.length < 8) {
+    errors.password = 'La contraseña debe tener al menos 8 caracteres';
+  }
+  
+  if (data.password !== data.password_confirm) {
+    errors.password_confirm = 'Las contraseñas no coinciden';
+  }
+  
+  return errors;
+}
+
+===============================================================================
+📞 CONTACTO
+-----------
+Si necesitas ayuda adicional o tienes preguntas sobre la implementación,
+no dudes en consultarme.
+
+Fecha de actualización: 8 de Septiembre, 2025
+===============================================================================

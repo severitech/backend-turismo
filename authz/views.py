@@ -48,7 +48,7 @@ def solicitar_recuperacion_password(request):
     # Enviar email
     send_mail(
         subject="Recuperación de contraseña",
-        message=f"Hola {usuario.nombre},\n\nPara restablecer tu contraseña haz clic en el siguiente enlace:\n{reset_url}\n\nSi no solicitaste este cambio, ignora este mensaje.",
+        message=f"Hola {usuario.nombre_completo},\n\nPara restablecer tu contraseña haz clic en el siguiente enlace:\n{reset_url}\n\nSi no solicitaste este cambio, ignora este mensaje.",
         from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=[usuario.email],
         fail_silently=False,

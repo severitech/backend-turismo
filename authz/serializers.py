@@ -11,14 +11,18 @@ class RolSerializer(serializers.ModelSerializer):
 
 class UsuarioSerializer(serializers.ModelSerializer):
     roles = serializers.PrimaryKeyRelatedField(queryset=Rol.objects.all(), many=True, required=False)
+    nombre_completo = serializers.ReadOnlyField()
+    
     class Meta:
         model = Usuario
-        fields = ["id","nombre","email","telefono","estado","roles","created_at","updated_at"]
+        fields = ["id","nombres","apellidos","nombre_completo","email","telefono","fecha_nacimiento",
+                 "genero","documento_identidad","pais","ciudad","estado","roles","created_at","updated_at"]
 
 class UsuarioCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Usuario
-        fields = ["nombre","email","password_hash","telefono"]
+        fields = ["nombres","apellidos","email","password_hash","telefono","fecha_nacimiento",
+                 "genero","documento_identidad","pais","ciudad"]
 
 class UsuarioRegistroSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, min_length=8)
@@ -26,7 +30,13 @@ class UsuarioRegistroSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Usuario
-        fields = ["nombre", "email", "password", "password_confirm", "telefono"]
+        fields = ["nombres", "apellidos", "email", "password", "password_confirm", 
+                 "telefono", "fecha_nacimiento", "genero", "documento_identidad", 
+                 "pais"]
+        extra_kwargs = {
+            'nombres': {'required': True},
+            'apellidos': {'required': True},
+        }
     
     def validate_email(self, value):
         """Validar que el email no esté ya registrado"""
@@ -56,7 +66,8 @@ class UsuarioRegistroSerializer(serializers.ModelSerializer):
             username=validated_data["email"],
             email=validated_data["email"],
             password=password,
-            first_name=validated_data.get("nombre", ""),
+            first_name=validated_data.get("nombres", ""),
+            last_name=validated_data.get("apellidos", ""),
         )
 
         # Crear el usuario de dominio (authz.Usuario)
