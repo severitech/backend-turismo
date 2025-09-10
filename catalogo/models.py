@@ -17,6 +17,6 @@ class Servicio(TimeStampedModel):
     punto_encuentro = models.CharField(max_length=255)
     visible_publico = models.BooleanField(default=True)
     categoria = models.ForeignKey(Categoria, on_delete=models.RESTRICT, related_name="servicios")
-    class Meta:
+    class Meta(TimeStampedModel.Meta):
         indexes = [models.Index(fields=["categoria"]), models.Index(fields=["tipo"])]
     def __str__(self): return self.titulo
