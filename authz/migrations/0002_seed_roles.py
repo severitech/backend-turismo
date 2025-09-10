@@ -2,7 +2,7 @@ from django.db import migrations
 
 def seed_roles(apps, schema_editor):
     Rol = apps.get_model('authz', 'Rol')
-    for nombre in ["ADMIN", "AGENTE", "CLIENTE"]:
+    for nombre in ["ADMIN", "AGENTE", "CLIENTE", "SOPORTE", "PROVEEDOR"]:
         Rol.objects.get_or_create(nombre=nombre)
 
 def noop(apps, schema_editor):

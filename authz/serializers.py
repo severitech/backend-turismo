@@ -9,14 +9,20 @@ class RolSerializer(serializers.ModelSerializer):
         model = Rol
         fields = ["id","nombre","created_at","updated_at"]
 
+
 class UsuarioSerializer(serializers.ModelSerializer):
     roles = serializers.PrimaryKeyRelatedField(queryset=Rol.objects.all(), many=True, required=False)
     nombre_completo = serializers.ReadOnlyField()
-    
     class Meta:
         model = Usuario
         fields = ["id","nombres","apellidos","nombre_completo","email","telefono","fecha_nacimiento",
                  "genero","documento_identidad","pais","ciudad","estado","roles","created_at","updated_at"]
+
+# Serializer específico para perfil propio
+class UserMeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Usuario
+        fields = ["nombres", "apellidos", "email", "telefono", "fecha_nacimiento", "genero", "documento_identidad", "pais"]
 
 class UsuarioCreateSerializer(serializers.ModelSerializer):
     class Meta:

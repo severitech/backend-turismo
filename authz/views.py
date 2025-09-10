@@ -117,7 +117,6 @@ class UsuarioViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["post"], url_path="reactivar", permission_classes=[permissions.IsAuthenticated])
     def reactivar(self, request, pk=None):
-        """Permite a un usuario con rol ADMIN reactivar una cuenta de usuario inactiva."""
         usuario_admin = Usuario.objects.get(email=request.user.email)
         if not usuario_admin.roles.filter(nombre="ADMIN").exists():
             return Response({"detail": "No tienes permisos para realizar esta acción."}, status=403)
@@ -127,18 +126,54 @@ class UsuarioViewSet(viewsets.ModelViewSet):
         usuario.estado = "ACTIVO"
         usuario.save()
         return Response({"detail": "Cuenta reactivada correctamente."}, status=200)
+
+    @action(detail=True, methods=["post"], url_path="disable", permission_classes=[permissions.IsAuthenticated])
+    def disable(self, request, pk=None):
+        usuario_admin = Usuario.objects.get(email=request.user.email)
+        if not usuario_admin.roles.filter(nombre="ADMIN").exists():
+            return Response({"detail": "No tienes permisos."}, status=403)
+        usuario = self.get_object()
+        usuario.estado = "INACTIVO"
+        usuario.save()
+        return Response({"detail": "Usuario inhabilitado."})
+
+    @action(detail=True, methods=["post"], url_path="enable", permission_classes=[permissions.IsAuthenticated])
+    def enable(self, request, pk=None):
+        usuario_admin = Usuario.objects.get(email=request.user.email)
+        if not usuario_admin.roles.filter(nombre="ADMIN").exists():
+            return Response({"detail": "No tienes permisos."}, status=403)
+        usuario = self.get_object()
+        usuario.estado = "ACTIVO"
+        usuario.save()
+        return Response({"detail": "Usuario habilitado."})
+
+    @action(detail=False, methods=["get"], url_path="clientes", permission_classes=[permissions.IsAuthenticated])
+    def listar_clientes(self, request):
+        usuario_admin = Usuario.objects.get(email=request.user.email)
+        if not usuario_admin.roles.filter(nombre="ADMIN").exists():
+            return Response({"detail": "No tienes permisos."}, status=403)
+        clientes = Usuario.objects.filter(roles__nombre="CLIENTE")
+        page = self.paginate_queryset(clientes)
+        if page is not None:
+            serializer = UsuarioSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = UsuarioSerializer(clientes, many=True)
+        return Response(serializer.data)
+
     @action(detail=False, methods=["get", "put", "patch"], url_path="me")
     def me(self, request):
-        """Permite al usuario autenticado ver y actualizar sus propios datos."""
         usuario = Usuario.objects.get(email=request.user.email)
         if request.method == "GET":
-            return Response(UsuarioSerializer(usuario).data)
+            from .serializers import UserMeSerializer
+            return Response(UserMeSerializer(usuario).data)
         elif request.method in ["PUT", "PATCH"]:
-            serializer = UsuarioSerializer(usuario, data=request.data, partial=(request.method=="PATCH"))
+            from .serializers import UserMeSerializer
+            serializer = UserMeSerializer(usuario, data=request.data, partial=(request.method=="PATCH"))
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data)
             return Response(serializer.errors, status=400)
+
     queryset = Usuario.objects.all()
     permission_classes = [permissions.IsAuthenticated]
 
@@ -155,6 +190,9 @@ class UsuarioViewSet(viewsets.ModelViewSet):
     )
     @action(detail=True, methods=["post"], url_path="asignar-rol")
     def asignar_rol(self, request, pk=None):
+        usuario_admin = Usuario.objects.get(email=request.user.email)
+        if not usuario_admin.roles.filter(nombre="ADMIN").exists():
+            return Response({"detail": "No tienes permisos."}, status=403)
         usuario = self.get_object()
         nombre_rol = request.data.get("rol")
         if not nombre_rol:
@@ -173,6 +211,9 @@ class UsuarioViewSet(viewsets.ModelViewSet):
     )
     @action(detail=True, methods=["post"], url_path="quitar-rol")
     def quitar_rol(self, request, pk=None):
+        usuario_admin = Usuario.objects.get(email=request.user.email)
+        if not usuario_admin.roles.filter(nombre="ADMIN").exists():
+            return Response({"detail": "No tienes permisos."}, status=403)
         usuario = self.get_object()
         nombre_rol = request.data.get("rol")
         if not nombre_rol:
