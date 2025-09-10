@@ -15,6 +15,7 @@ from django.utils.crypto import get_random_string
 from django.urls import reverse
 import datetime
 from django.utils import timezone
+from django.db import models
 
 # Modelo simple para almacenar tokens de recuperación (puedes migrar a un modelo real si lo deseas)
 from django.core.cache import cache
@@ -42,7 +43,7 @@ def solicitar_recuperacion_password(request):
         return Response({"detail": "Si el email existe, se enviará un enlace de recuperación."}, status=200)
     # Generar token único y guardar en cache (puedes usar modelo real si prefieres)
     token = get_random_string(48)
-    cache.set(f"resetpw:{token}", usuario.id, timeout=60*60)  # 1 hora
+    cache.set(f"resetpw:{token}", usuario.id, timeout=60*60)   # type: ignore
     # Construir enlace
     reset_url = request.build_absolute_uri(reverse("reset_password") + f"?token={token}")
     # Enviar email
@@ -142,7 +143,8 @@ class UsuarioViewSet(viewsets.ModelViewSet):
     queryset = Usuario.objects.all()
     permission_classes = [permissions.IsAuthenticated]
 
-    def get_serializer_class(self):
+    from rest_framework.serializers import Serializer
+    def get_serializer_class(self):  # type: ignore
         return UsuarioCreateSerializer if self.action in ["create"] else UsuarioSerializer
 
     @extend_schema(
@@ -223,6 +225,8 @@ def registrar_usuario(request):
 
     with transaction.atomic():
         usuario = serializer.save()
+        if isinstance(usuario, list):
+            usuario = usuario[0]
 
         # Asegurar rol CLIENTE
         rol, _ = Rol.objects.get_or_create(nombre="CLIENTE")
@@ -240,5 +244,5 @@ def registrar_usuario(request):
     return Response({
         "access": str(refresh.access_token),
         "refresh": str(refresh),
-        "usuario_id": usuario.id,
+    "usuario_id": usuario.id,  # type: ignore
     }, status=status.HTTP_201_CREATED)
