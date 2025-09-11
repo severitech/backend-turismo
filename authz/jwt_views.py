@@ -24,7 +24,7 @@ def verify_password(plain, stored_hash):
 @permission_classes([AllowAny])
 @extend_schema(
     summary="Iniciar sesión",
-    description="Autenticación por email y contraseña. Devuelve tokens JWT.",
+    description="Autenticación por email y password. Devuelve tokens JWT.",
     request=inline_serializer(
         name="LoginRequest",
         fields={
@@ -44,23 +44,20 @@ def verify_password(plain, stored_hash):
     },
 )
 def login_view(request):
+    print("LOGIN BODY RECIBIDO:", request.data)
     email = request.data.get("email")
     password = request.data.get("password")
     try:
         u = Usuario.objects.get(email=email, estado="ACTIVO")
+        print("USUARIO ENCONTRADO:", u.email, "ROLES:", list(u.roles.values_list('nombre', flat=True)))
     except Usuario.DoesNotExist:
+        print("NO SE ENCONTRÓ USUARIO:", email)
         return Response({"detail":"Credenciales inválidas"}, status=401)
-    if not verify_password(password, u.password_hash):
+    if not u.check_password(password):
+        print("CONTRASEÑA INCORRECTA para:", email)
         return Response({"detail":"Credenciales inválidas"}, status=401)
-    # Si existe el Django User con ese email, emite tokens para ese usuario
-    User = get_user_model()
-    django_user = User.objects.filter(email=email).first()
-    if django_user:
-        refresh = RefreshToken.for_user(django_user)
-    else:
-        # Fallback: usar el authz.Usuario
-        refresh = RefreshToken.for_user(u)
-        refresh["uid"] = u.id
+    print("LOGIN EXITOSO:", email)
+    refresh = RefreshToken.for_user(u)
     return Response({"access": str(refresh.access_token), "refresh": str(refresh)})
 
 @api_view(["POST"])

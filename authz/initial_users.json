@@ -1,24 +1,27 @@
 [
   {
-    "nombre": "Gabriel Moreno",
+    "nombres": "Gabriel",
+    "apellidos": "Moreno",
     "email": "gabriel.moreno@autonoma.edu.bo",
-    "password_hash": "admin123",
+    "password": "admin123",
     "telefono": "70000001",
     "estado": "ACTIVO",
     "roles": ["ADMIN"]
   },
   {
-    "nombre": "María Fernández",
+    "nombres": "María",
+    "apellidos": "Fernández",
     "email": "maria.fernandez@autonoma.edu.bo",
-    "password_hash": "operador123",
+    "password": "operador123",
     "telefono": "70000002",
     "estado": "ACTIVO",
     "roles": ["OPERADOR"]
   },
   {
-    "nombre": "Juan Pérez",
+    "nombres": "Juan",
+    "apellidos": "Pérez",
     "email": "juan.perez@autonoma.edu.bo",
-    "password_hash": "cliente123",
+    "password": "cliente123",
     "telefono": "70000003",
     "estado": "ACTIVO",
     "roles": ["CLIENTE"]

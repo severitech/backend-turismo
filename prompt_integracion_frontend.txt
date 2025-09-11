@@ -1,0 +1,20 @@
+# Solicitud de código de recuperación por correo
+
+Para que el usuario reciba el código de seguridad en su correo, utiliza el siguiente endpoint:
+
+```
+POST /api/auth/solicitar-recuperacion-password/
+```
+
+#### Headers:
+- Authorization: Bearer <jwt_access_token>
+- Content-Type: application/json
+
+#### Body (ejemplo):
+```json
+{
+	"email": "tucorreo@dominio.com"
+}
+```
+
+El backend enviará un código único al correo proporcionado si corresponde al usuario autenticado.
